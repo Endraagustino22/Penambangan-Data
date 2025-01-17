@@ -1,99 +1,101 @@
+import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
-from sklearn.preprocessing import LabelEncoder
-import streamlit as st
 
-# Load dataset
-df = pd.read_csv('Dataset of Diabetes .csv')
+# Judul aplikasi
+st.title("Random Forest Classifier for Diabetes Prediction")
 
-# Streamlit title and description
-st.title("Diabetes Prediction Model")
-st.write("This app predicts diabetes based on various health features.")
+# Fungsi utama aplikasi
+def main():
+    st.header("Dataset Import and Model Training")
 
-# Display first 5 rows of the dataset
-st.subheader("First 5 Rows of Dataset")
-st.write(df.head())
+    # Path ke dataset
+    file_path = "Dataset of Diabetes .csv"  # Ganti dengan path dataset Anda
 
-# Check for null values and display
-null_count = df.isnull().sum()
-st.subheader("Count of Null Values")
-st.write(null_count)
+    try:
+        # Membaca dataset
+        df = pd.read_csv(file_path)
+        st.write("Dataset Preview:")
+        st.dataframe(df.head())
 
-# Clean the data
-df['CLASS'] = df['CLASS'].str.strip()
-df['Gender'] = df['Gender'].str.upper()
-df['Gender'] = df['Gender'].map({'M': 1, 'F': 0})
+        # Data preprocessing
+        df['CLASS'] = df['CLASS'].str.strip()
+        df['Gender'] = df['Gender'].str.upper()
+        df['Gender'] = df['Gender'].map({'M': 1, 'F': 0})
+        df = df.rename(columns={
+            "Age": "AGE",
+            "Cholesterol": "Chol",
+            "Creatinine ratio (Cr)": "Cr",
+            "HBA1C": "HbA1c"
+        })
+        df = df.drop(['ID', 'No_Pation'], axis=1)
 
-# One-hot encoding for CLASS
-df = pd.get_dummies(df, columns=['CLASS'], drop_first=True)
+        # Memisahkan fitur dan label
+        X = df.drop(['CLASS'], axis=1)  # fitur
+        y = df['CLASS']  # label
 
-# Drop unnecessary columns
-df = df.drop(['ID', 'No_Pation'], axis=1)
+        # Pembagian data
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Create the target column
-df['Target'] = df[['CLASS_P', 'CLASS_Y']].idxmax(axis=1)
-df = df.drop(['CLASS_P', 'CLASS_Y'], axis=1)
+        # Melatih model
+        model = RandomForestClassifier(random_state=42)
+        model.fit(X_train, y_train)
 
-# Label encode the target
-encoder = LabelEncoder()
-df['Target'] = encoder.fit_transform(df['Target'])
+        # Evaluasi model
+        y_train_pred = model.predict(X_train)
+        y_test_pred = model.predict(X_test)
 
-# Features and labels
-X = df.drop(['Target'], axis=1)
-y = df['Target']
+        train_accuracy = accuracy_score(y_train, y_train_pred)
+        test_accuracy = accuracy_score(y_test, y_test_pred)
 
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        st.subheader("Model Performance")
+        st.write(f"Training Accuracy: {train_accuracy:.2f}")
+        st.write(f"Testing Accuracy: {test_accuracy:.2f}")
 
-# Train Random Forest model
-model = RandomForestClassifier(random_state=42)
-model.fit(X_train, y_train)
+        # Menampilkan laporan klasifikasi
+        st.subheader("Classification Report")
+        report = classification_report(y_test, y_test_pred, output_dict=True)
+        report_df = pd.DataFrame(report).transpose()
+        st.dataframe(report_df)
 
-# Make predictions
-y_train_pred = model.predict(X_train)
-y_test_pred = model.predict(X_test)
+        # Input manual untuk prediksi
+        st.subheader("Predict Diabetes Class")
+        gender = st.selectbox("Gender", options=["Male", "Female"])
+        age = st.number_input("AGE", max_value=120, step=1)
+        urea = st.number_input("Urea", max_value=150, step=1)
+        cr = st.number_input("Cr (Creatinine ratio)", step=0.1)
+        hba1c = st.number_input("HbA1c Level (%)", max_value=15.0, step=0.1)
+        chol = st.number_input("Chol (Cholesterol)", max_value=400, step=1)
+        tg = st.number_input("TG (Triglycerides)", max_value=400, step=1)
+        hdl = st.number_input("HDL Cholesterol", max_value=100, step=1)
+        ldl = st.number_input("LDL Cholesterol", max_value=250, step=1)
+        vldl = st.number_input("VLDL Cholesterol", max_value=100, step=1)
+        bmi = st.number_input("BMI",max_value=60.0, step=0.1)
 
-# Accuracy results
-train_accuracy = accuracy_score(y_train, y_train_pred)
-test_accuracy = accuracy_score(y_test, y_test_pred)
+        if st.button("Predict"):
+            # Konversi input ke format model
+            input_data = pd.DataFrame({
+                "Gender": [1 if gender == "Male" else 0],
+                "AGE": [age],
+                "Urea": [urea],
+                "Cr": [cr],
+                "HbA1c": [hba1c],
+                "Chol": [chol],
+                "TG": [tg],
+                "HDL": [hdl],
+                "LDL": [ldl],
+                "VLDL": [vldl],
+                "BMI": [bmi],
+            })
 
-st.subheader(f"Training Accuracy: {train_accuracy:.2f}")
-st.subheader(f"Testing Accuracy: {test_accuracy:.2f}")
+            # Prediksi
+            prediction = model.predict(input_data)[0]
+            st.write(f"Predicted Class: **{prediction}**")
 
-# Classification report
-st.subheader("Classification Report (Test Data)")
-st.text(classification_report(y_test, y_test_pred))
+    except FileNotFoundError:
+        st.error(f"Dataset file not found at path: {file_path}. Please check the path and try again.")
 
-# Feature importances
-feature_importances = model.feature_importances_
-features = X.columns
-importance_df = pd.DataFrame({'Feature': features, 'Importance': feature_importances}).sort_values(by='Importance', ascending=False)
-
-st.subheader("Feature Importance")
-st.write(importance_df)
-
-# Feature importance plot
-st.subheader("Feature Importance Visualization")
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.barh(importance_df['Feature'], importance_df['Importance'])
-ax.set_xlabel('Importance')
-ax.set_ylabel('Features')
-ax.set_title('Feature Importances')
-st.pyplot(fig)
-
-# User input for prediction
-st.subheader("Make a Prediction")
-input_data = []
-for col in X.columns:
-    input_value = st.number_input(f"Enter {col}", value=0.0)
-    input_data.append(input_value)
-
-if st.button("Predict"):
-    input_data = np.array(input_data).reshape(1, -1)
-    prediction = model.predict(input_data)
-    predicted_class = encoder.inverse_transform(prediction)
-    st.write(f"Predicted Class: {predicted_class[0]}")
+if __name__ == "__main__":
+    main()
