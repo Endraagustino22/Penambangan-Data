@@ -2,12 +2,13 @@ import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, accuracy_score
 
 # Judul aplikasi
-st.title("Random Forest Classifier for Diabetes Prediction")
+st.title("Diabetes Prediction Using Multiple Algorithms")
 
-# Fungsi utama aplikasi
 def main():
     st.header("Dataset Import and Model Training")
 
@@ -39,40 +40,56 @@ def main():
         # Pembagian data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # Melatih model
-        model = RandomForestClassifier(random_state=42)
-        model.fit(X_train, y_train)
+        # Model yang akan digunakan
+        models = {
+            "Random Forest": RandomForestClassifier(random_state=42),
+            "Logistic Regression": LogisticRegression(max_iter=1000),
+            "K-Nearest Neighbors": KNeighborsClassifier()
+        }
 
-        # Evaluasi model
-        y_train_pred = model.predict(X_train)
-        y_test_pred = model.predict(X_test)
+        results = {}
 
-        train_accuracy = accuracy_score(y_train, y_train_pred)
-        test_accuracy = accuracy_score(y_test, y_test_pred)
+        # Melatih dan mengevaluasi setiap model
+        for name, model in models.items():
+            model.fit(X_train, y_train)
+            y_train_pred = model.predict(X_train)
+            y_test_pred = model.predict(X_test)
 
-        st.subheader("Model Performance")
-        st.write(f"Training Accuracy: {train_accuracy:.2f}")
-        st.write(f"Testing Accuracy: {test_accuracy:.2f}")
+            train_accuracy = accuracy_score(y_train, y_train_pred)
+            test_accuracy = accuracy_score(y_test, y_test_pred)
 
-        # Menampilkan laporan klasifikasi
-        st.subheader("Classification Report")
-        report = classification_report(y_test, y_test_pred, output_dict=True)
-        report_df = pd.DataFrame(report).transpose()
-        st.dataframe(report_df)
+            results[name] = {
+                "Training Accuracy": train_accuracy,
+                "Testing Accuracy": test_accuracy,
+                "Classification Report": classification_report(y_test, y_test_pred, output_dict=True)
+            }
+
+        # Menampilkan hasil untuk setiap model
+        for name, result in results.items():
+            st.subheader(f"{name} Model Performance")
+            st.write(f"Training Accuracy: {result['Training Accuracy']:.2f}")
+            st.write(f"Testing Accuracy: {result['Testing Accuracy']:.2f}")
+
+            report_df = pd.DataFrame(result['Classification Report']).transpose()
+            st.dataframe(report_df)
 
         # Input manual untuk prediksi
         st.subheader("Predict Diabetes Class")
-        gender = st.selectbox("Gender", options=["Male", "Female"])
-        age = st.number_input("AGE", max_value=120, step=1)
-        urea = st.number_input("Urea", max_value=150, step=1)
-        cr = st.number_input("Cr (Creatinine ratio)", step=0.1)
+
+        # Pilih model untuk prediksi
+        model_choice = st.selectbox("Choose Model", options=["Random Forest", "Logistic Regression", "K-Nearest Neighbors"])
+
+        gender = st.selectbox("Gender (M/F)", options=["Male", "Female"])
+        age = st.number_input("AGE (tahun)", max_value=120, step=1)
+        urea = st.number_input("Urea (mg/dL)", max_value=150, step=1)
+        cr = st.number_input("Cr (Creatinine ratio) ", step=0.1)
         hba1c = st.number_input("HbA1c Level (%)", max_value=15.0, step=0.1)
-        chol = st.number_input("Chol (Cholesterol)", max_value=400, step=1)
-        tg = st.number_input("TG (Triglycerides)", max_value=400, step=1)
-        hdl = st.number_input("HDL Cholesterol", max_value=100, step=1)
-        ldl = st.number_input("LDL Cholesterol", max_value=250, step=1)
-        vldl = st.number_input("VLDL Cholesterol", max_value=100, step=1)
-        bmi = st.number_input("BMI",max_value=60.0, step=0.1)
+        chol = st.number_input("Chol (Cholesterol)  (mg/dL)", max_value=400, step=1)
+        tg = st.number_input("TG (Triglycerides) (mg/dL)", max_value=400, step=1)
+        hdl = st.number_input("HDL Cholesterol (mg/dL)", max_value=100, step=1)
+        ldl = st.number_input("LDL Cholesterol (mg/dL)", max_value=250, step=1)
+        vldl = st.number_input("VLDL Cholesterol (mg/dL)", max_value=100, step=1)
+        bmi = st.number_input("BMI", max_value=60.0, step=0.1)
 
         if st.button("Predict"):
             # Konversi input ke format model
@@ -90,8 +107,8 @@ def main():
                 "BMI": [bmi],
             })
 
-            # Prediksi
-            prediction = model.predict(input_data)[0]
+            # Prediksi dengan model yang dipilih
+            prediction = models[model_choice].predict(input_data)[0]
             st.write(f"Predicted Class: **{prediction}**")
 
     except FileNotFoundError:
