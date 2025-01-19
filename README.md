@@ -1,6 +1,30 @@
-# Prediksi Diabetes dengan Machine Learning
+# PREDIKSI DIABETES DENGAN ALGORITMA RANDOM FOREST, LOGISTIC REGRESSION, DAN KNN
+
 
 Proyek ini menggunakan dataset terkait kesehatan untuk memprediksi kemungkinan seseorang mengidap diabetes. Dengan memanfaatkan algoritma pembelajaran mesin seperti *Random Forest*, *Logistic Regression*, dan *K-Nearest Neighbors (KNN)*, proyek ini bertujuan untuk memberikan prediksi akurat berdasarkan fitur-fitur kesehatan yang tersedia.
+
+## Masalah
+Diabetes adalah salah satu masalah kesehatan yang umum dan berkembang di seluruh dunia. Prediksi dini terhadap penyakit ini dapat membantu dalam pencegahan dan pengelolaan yang lebih baik. Dataset yang digunakan berisi berbagai atribut medis yang dapat memengaruhi risiko seseorang terkena diabetes. melakukan diagnosis secara manual untuk setiap pasien membutuhkan waktu dan sumber daya yang besar. Oleh karena itu penggunaan data mining bisa sangat membantu pengambilan Keputusan yang lebih baik
+
+## Tujuan
+- **Memahami risiko diabetes**
+- **Membangun model prediksi**
+- **Evaluasi dan pengujian model**
+- **Manfaat bagi kesehatan masyarakat**
+
+## Alur
+![Model Performance](diagram_DM.png)
+
+
+## EDA
+-	Memeriksa Struktur dan Tipe Data sesuai
+-	Menangani missing data
+-	Memvisualisasikan distribusi data
+-	Mengidentifikasi korelasi antar fitur
+-	Menangani outlier
+-	Transformasi data (normalisasi, encoding)
+-	Mempersiapkan data untuk model (split data)
+
 
 ## Fitur Utama
 
@@ -29,6 +53,14 @@ Attribut
 Label
 - **CLASS**: Label target (Diabetic/Non-Diabetic)
 
+
+## Proses Modeling
+-	Pemilihan model
+-	Pembagian data
+-	Pelatihan Model
+-	Menyimpan Model
+-	Menguji Model
+-	Evaluasi
 
 ## Instalasi
 
