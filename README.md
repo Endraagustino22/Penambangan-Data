@@ -1,5 +1,8 @@
 # PREDIKSI DIABETES DENGAN ALGORITMA RANDOM FOREST, LOGISTIC REGRESSION, DAN KNN
 
+Nama : Endra Agustino
+Nim  : A11.2022.14614
+Kelompok : A11.4517
 
 Proyek ini menggunakan dataset terkait kesehatan untuk memprediksi kemungkinan seseorang mengidap diabetes. Dengan memanfaatkan algoritma pembelajaran mesin seperti *Random Forest*, *Logistic Regression*, dan *K-Nearest Neighbors (KNN)*, proyek ini bertujuan untuk memberikan prediksi akurat berdasarkan fitur-fitur kesehatan yang tersedia.
 
