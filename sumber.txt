@@ -1,0 +1,11 @@
+Apriori Python:
+	https://www.geeksforgeeks.org/implementing-apriori-algorithm-in-python/
+
+Dataset:
+	http://archive.ics.uci.edu/ml/datasets/Online+Retail
+
+Sumber Lain:
+	https://deepak6446.medium.com/apriori-algorithm-in-python-recommendation-engine-5ba89bd1a6da
+
+Data Restoran:
+	http://buku.dioskurn.com/buku1/ch11/
