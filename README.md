@@ -38,6 +38,9 @@ Diabetes adalah salah satu masalah kesehatan yang umum dan berkembang di seluruh
 
 ## Dataset
 
+Sumber dataset:
+https://data.mendeley.com/datasets/wj9rwkp9c2/1
+
 Dataset yang digunakan memiliki kolom berikut:
 
 Attribut
